@@ -13,10 +13,12 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.util.EntityUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fnx.webapp.controller.BaseControllerTestCase;
 
+@Ignore
 public class TenantControllerTest extends BaseControllerTestCase {
 	
 	@Test
@@ -25,7 +27,7 @@ public class TenantControllerTest extends BaseControllerTestCase {
 	    HttpClient httpclient = new DefaultHttpClient();
 	    httpclient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
 
-	    HttpPost httppost = new HttpPost("http://127.0.0.1:8080/chat/open/image/upload.json");
+	    HttpPost httppost = new HttpPost("http://chat.3fnx.com/chat/open/image/upload.json");
 	    File file = new File("/Users/oceanyang/purple_button.png");
 
 	    MultipartEntity mpEntity = new MultipartEntity();
