@@ -6,6 +6,7 @@ public class UserModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private String id;
 	private String name;
 	private String sex;
 	private int age;
@@ -41,6 +42,14 @@ public class UserModel implements Serializable {
 
 	public void setImagePath(String imagePath) {
 		this.imagePath = imagePath;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 }

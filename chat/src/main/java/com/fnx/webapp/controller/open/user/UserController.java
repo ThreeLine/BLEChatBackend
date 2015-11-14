@@ -35,6 +35,7 @@ public class UserController {
 		userDBVO.setName(model.getName());
 		userDBVO.setSex(model.getSex());
 		userAutoRepo.save(userDBVO);
+		model.setId(userDBVO.getId());
 		return resModel;
 	}
 	
