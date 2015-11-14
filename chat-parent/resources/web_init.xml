@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:task="http://www.springframework.org/schema/task" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+			http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+	<bean id="webConfigProperties"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="locations">
+			<list>
+				<value>classpath:web_config.properties</value>
+				<value>classpath:repo_config.properties</value>
+				<value>classpath:upload_config.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<import resource="classpath:/repo_init.xml" />
+	<import resource="classpath:/domain_init.xml" />
+
+	<bean id="encoder"
+		class="org.springframework.security.crypto.password.StandardPasswordEncoder" />
+		
+	<bean
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="staticMethod"
+			value="com.fnx.webapp.util.WebappPropertiesUtil.setUploadPath" />
+		<property name="arguments">
+			<list>
+				<value>${property_upload_path}</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="staticMethod"
+			value="com.fnx.webapp.util.WebappPropertiesUtil.setUploadContext" />
+		<property name="arguments">
+			<list>
+				<value>${property_upload_context}</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="resourceMessageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>ApplicationResources</value>
+				<value>ValidationMessage</value>
+			</list>
+		</property>
+		<property name="useCodeAsDefaultMessage" value="true" />
+	</bean>
+
+
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="properties" ref="webConfigProperties"></property>
+	</bean>
+
+	<context:component-scan base-package="com.fnx.webapp.service">
+		<context:include-filter type="annotation"
+			expression="org.springframework.stereotype.Service" />
+	</context:component-scan>
+
+</beans>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.fnx</groupId>
+	<artifactId>chat-parent</artifactId>
+	<packaging>pom</packaging>
+	<version>4.0.0</version>
+	<name>chat-parent</name>
+	<url>http://www.3fnx.com</url>
+
+	<modules>
+		<!--begin basic project -->
+		<module>../chat</module>
+		<!-- end terminal project -->
+	</modules>
+
+	<prerequisites>
+		<maven>3.0.4</maven>
+	</prerequisites>
+
+	<licenses>
+		<license>
+		</license>
+	</licenses>
+
+	<scm>
+	</scm>
+
+	<issueManagement>
+	</issueManagement>
+
+	<developers>
+		<developer>
+		</developer>
+	</developers>
+
+	<build>
+		<defaultGoal>install</defaultGoal>
+	</build>
+
+</project>

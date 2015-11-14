@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>short url demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="format-detection" content="telephone=no" />
+
+<script type="text/javascript" src="../scripts/jquery-1.9.1-main.js"></script>
+</head>
+
+<script type="text/javascript">
+
+var generateUrl = function() {
+    $.ajax({
+        url:"http://createcdigital.com:8080/wechat/url/generate.json",
+		type:'post',
+		data:JSON.stringify({originalUrl: $("#original_url").val()}),
+		dataType:'json',
+		contentType: "application/json;charset=utf-8",
+		timeout:1000,
+		error:function(){alert('Error');},
+        success: function(response) {
+            
+            $("#result").val(response.data.shortUrl);
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            //$(".content").text(textStatus);
+        }
+    });
+};
+function alertValue() {
+	alert($("#original_url").val());
+}
+
+$(document).ready(function() {
+})
+
+
+</script>
+<body>
+<form name="generateUrlForm" action="">
+<label>please input original url:</label>
+<input type="text" name="original_url" id="original_url" size="60" value="" />
+<input type="button" onClick="generateUrl()" name="submit_btn" id="submit_btn" value="generate" />
+<br />
+<label>result: http://createcdigital.com:8080/wechat/</label>
+<input type="text" name="result" id="result" size="10" value="" />
+</form>
+</body>
+</html>

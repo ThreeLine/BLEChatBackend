@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+			  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+              http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.0.xsd">    
+	
+	<!-- disabled/enabled -->
+	<global-method-security pre-post-annotations="enabled"/>
+	
+	<http pattern="/auth/**" security="none" />
+	<http pattern="/open/**" security="none" />
+		
+	<!-- 因为还没做登陆，所以先不用登陆 
+	<http pattern="/tenants/**" security="none" />
+	-->		
+	<http auto-config="true" use-expressions="true" entry-point-ref="loginUrlAuthenticationEntryPoint">
+		<form-login authentication-success-handler-ref="securitySuccessHandler"
+			authentication-failure-handler-ref="securityFailureHandler" login-processing-url="/j_spring_security_check.json"/>
+		<intercept-url pattern="/**/*.json" access="isAuthenticated()" />
+		<intercept-url pattern="/**/*.jsonp" access="isAuthenticated()" />
+		<intercept-url pattern="/**/*.xhtml" access="isAuthenticated()" />
+		<logout delete-cookies="true" logout-success-url="/auth/logoutSuccess.json" logout-url="/j_spring_security_logout.json"/>
+
+		<!-- 验证权限失败的 json -->
+		<access-denied-handler error-page="/auth/accessDenied.json"/>
+		<!-- 因为spring 4 默认是打开CsrfFilter, 而且这个filter是不允许post请求，所以我们要手动把它关闭 -->
+		<csrf disabled="true"/>
+	</http>
+	
+	<beans:bean id="daoAuthenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+	    <beans:property name="hideUserNotFoundExceptions" value="false" />
+	    <beans:property name="userDetailsService" ref="userDetailsService"/>
+	    <beans:property name="passwordEncoder" ref="encoder"/>
+	</beans:bean>
+	
+	<authentication-manager>
+		<authentication-provider ref="daoAuthenticationProvider"></authentication-provider>
+	</authentication-manager>
+
+	<beans:bean id="loginUrlAuthenticationEntryPoint" class="com.fnx.webapp.controller.account.SecurityLoginUrlAuthenticationEntryPoint">
+		<beans:constructor-arg>
+			<beans:value>/auth/anonymousModel</beans:value>
+		</beans:constructor-arg>
+		<beans:property name="useForward" value="true"></beans:property>
+	</beans:bean>
+	
+	<beans:bean id="securitySuccessHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler">
+		<beans:property name="defaultTargetUrl" value="/auth/loginSuccess.json"></beans:property>
+	</beans:bean>
+	<beans:bean id="securityFailureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+		<beans:property name="defaultFailureUrl" value="/auth/loginFail.json" />
+		<beans:property name="useForward" value="true" />
+	</beans:bean>
+	<beans:bean id="jsonpFilter" class="com.fnx.webapp.filter.JsonpCallbackFilter" >
+		<beans:property name="param" value="callback"></beans:property>
+		<beans:property name="defaultValue" value="callback"></beans:property>
+	</beans:bean>
+	
+	<beans:bean id="appFilters" class="org.springframework.security.web.FilterChainProxy">
+		<beans:constructor-arg>
+			<beans:list>
+				<filter-chain filters="jsonpFilter" pattern="/**/*.jsonp"/>
+			</beans:list>
+		</beans:constructor-arg>
+	</beans:bean>
+</beans:beans>

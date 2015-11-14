@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xsi:schemaLocation="http://www.springframework.org/schema/context
+          http://www.springframework.org/schema/context/spring-context-4.0.xsd
+          http://www.springframework.org/schema/data/mongo
+          http://www.springframework.org/schema/data/mongo/spring-mongo-1.5.xsd
+          http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	          
+	<bean id="basicMongo" class="org.springframework.data.mongodb.core.MongoFactoryBean">
+		<property name="host" value="${property_mongodb_host}"/>
+		<property name="port" value="${property_mongodb_port?:27017}"/>
+		<!-- 以下这句会导致一直连localhost  
+		<property name="replicaSetSeeds" value="${property_mongodb_replicaset}"/>
+		-->
+		<property name="writeConcern" value="#{T(com.mongodb.WriteConcern).ACKNOWLEDGED}"></property>
+		<property name="mongoOptions">
+			<bean class="org.springframework.data.mongodb.core.MongoOptionsFactoryBean">
+				<property name="connectionsPerHost" value="50"></property>
+				<property name="connectTimeout" value="0"></property>
+				<property name="autoConnectRetry" value="true"></property>
+				<property name="threadsAllowedToBlockForConnectionMultiplier" value="5"></property>
+				<property name="socketKeepAlive" value="true"></property>
+				<property name="socketTimeout" value="0"></property>
+				<property name="ssl" value="${property_mongodb_ssl}"></property>
+			</bean>
+		</property>
+	</bean>
+	
+	<mongo:db-factory id="basicMongoDbFactory"  dbname="${property_mongodb_dbname}" mongo-ref="basicMongo" username="${property_mongodb_username}" password="${property_mongodb_password}" authentication-dbname="${property_mongodb_authentication_dbname}"/>
+	<mongo:repositories base-package="com.fnx.repository.mongo" mongo-template-ref="basicMongoTemplate" />
+
+	<!-- remove _class field by auto generated -->
+	<bean id="defaultMongoTypeMapper"
+		class="org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper">
+		<constructor-arg name="typeKey">
+			<null />
+		</constructor-arg>
+	</bean>
+	<bean id="basicMappingMongoConverter"
+		class="org.springframework.data.mongodb.core.convert.MappingMongoConverter">
+		<constructor-arg name="mongoDbFactory" ref="basicMongoDbFactory" />
+		<constructor-arg name="mappingContext">
+			<bean class="org.springframework.data.mongodb.core.mapping.MongoMappingContext"></bean>
+		</constructor-arg>
+		<property name="typeMapper" ref="defaultMongoTypeMapper" />
+	</bean>
+
+	<bean id="basicMongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="basicMongoDbFactory" />
+		<constructor-arg name="mongoConverter" ref="basicMappingMongoConverter" />
+	</bean>
+	<context:component-scan base-package="com.fnx.repository" />
+</beans>

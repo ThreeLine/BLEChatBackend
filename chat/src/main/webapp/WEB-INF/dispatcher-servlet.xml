@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xmlns:p="http://www.springframework.org/schema/p"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd"
+       default-lazy-init="true">
+	
+    <bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor" >
+    	<property name="paramName" value="language"></property>
+    </bean> 
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
+    	<property name="defaultLocale" value="en_US" />
+    </bean>
+    <mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/auth/**" />
+			<ref bean="localeChangeInterceptor" />
+		</mvc:interceptor>
+		<bean id="webContentInterceptor" 
+          class="org.springframework.web.servlet.mvc.WebContentInterceptor">
+	        <property name="cacheSeconds" value="0"/>
+	        <property name="useExpiresHeader" value="true"/>
+	        <property name="useCacheControlHeader" value="true"/>
+	        <property name="useCacheControlNoStore" value="true"/>
+    	</bean>
+	</mvc:interceptors>
+    <!-- Activates scanning of @Autowired -->
+    <context:annotation-config/>
+        	
+    <context:component-scan base-package="com.fnx.webapp.controller">
+    	<context:include-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+    </context:component-scan>
+        
+    <aop:aspectj-autoproxy proxy-target-class="true" />    
+
+    <!-- Configures the @Controller programming model -->
+    
+	<mvc:annotation-driven content-negotiation-manager="contentNegotiationManager" >
+		<mvc:message-converters>
+			<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+				<property name="prettyPrint" value="true"></property>
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+	
+	<bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+   		<!-- 设置为true以忽略对Accept Header的支持 -->
+		<property name="ignoreAcceptHeader" value="true" />
+		
+		<!-- 用于开启 /userinfo/123?format=json 的支持 -->
+		<property name="favorParameter" value="false" />
+		
+		<!-- 在没有扩展名时即: "/user/1" 时的默认展现形式 -->
+		<property name="defaultContentType" value="application/json" />
+		
+		<!-- 扩展名至mimeType的映射,即 /user.json => application/json -->
+		<property name="mediaTypes">
+			<map>
+				<entry key="json" value="application/json" />
+			</map>
+		</property>
+	</bean>	
+	
+	<bean id="contentNegotiatingViewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver" >
+		<property name="order" value="1" />
+		<property name="contentNegotiationManager" ref="contentNegotiationManager"/>
+		<property name="defaultViews">
+			<list>
+				<!-- for application/json -->
+				<bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
+					<property name="prettyPrint" value="true"></property>
+					<property name="extractValueFromSingleKeyModel" value="true"></property>
+				</bean>
+				<!-- for application/xml -->
+				<!-- 
+				<bean class="org.springframework.web.servlet.view.xml.MarshallingView" > 
+					<property name="marshaller"> 
+						<bean class="org.springframework.oxm.xstream.XStreamMarshaller"/> 
+					</property> 
+				</bean> 
+				-->
+			</list>
+		</property>
+	</bean> 
+
+</beans>
