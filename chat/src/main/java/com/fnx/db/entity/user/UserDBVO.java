@@ -11,9 +11,13 @@ public class UserDBVO extends BaseEntity {
 
 	public final static String SEX_FEMALE = "female";
 	public final static String SEX_MALE = "male";
+	
+	public final static String STATUS_BUSY = "busy";
+	public final static String STATUS_READY = "ready";
 
 	private String name;
 	private String sex = UserDBVO.SEX_FEMALE;
+	private String status = UserDBVO.STATUS_READY;
 	private int age;
 	private String imagePath;
 
@@ -47,5 +51,13 @@ public class UserDBVO extends BaseEntity {
 
 	public void setImagePath(String imagePath) {
 		this.imagePath = imagePath;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 }

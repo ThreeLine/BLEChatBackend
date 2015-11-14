@@ -60,7 +60,34 @@ public class UserController {
 		model.setImagePath(userDBVO.getImagePath());
 		model.setName(userDBVO.getName());
 		model.setSex(userDBVO.getSex());
+		model.setStatus(userDBVO.getStatus());
 		resModel.setData(model);
 		return resModel;
+	}
+	
+	@RequestMapping(value = "/person/{id}/changeToBusy", method = RequestMethod.PUT)
+	public ResponseModel changeToBusy(@PathVariable String id) {
+		ResponseModel resModel = new ResponseModel();
+		UserDBVO userDBVO = userAutoRepo.findOne(id);
+		if (userDBVO == null) {
+			resModel.setCode(WebConstants.RESPONSE_CODE_RESOURCE_NOT_EXIST);
+			return resModel;
+		}	
+		userDBVO.setStatus(UserDBVO.STATUS_BUSY);
+		userAutoRepo.save(userDBVO);
+		return resModel;
+	}
+	
+	@RequestMapping(value = "/person/{id}/changeToReady", method = RequestMethod.PUT)
+	public ResponseModel changeToReady(@PathVariable String id) {
+		ResponseModel resModel = new ResponseModel();
+		UserDBVO userDBVO = userAutoRepo.findOne(id);
+		if (userDBVO == null) {
+			resModel.setCode(WebConstants.RESPONSE_CODE_RESOURCE_NOT_EXIST);
+			return resModel;
+		}	
+		userDBVO.setStatus(UserDBVO.STATUS_READY);
+		userAutoRepo.save(userDBVO);
+		return resModel;		
 	}
 }

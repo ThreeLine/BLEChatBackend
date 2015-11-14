@@ -51,6 +51,7 @@ public class UserControllerTest extends BaseControllerTestCase {
 		userDBVO.setName("Ocean");
 		userDBVO.setSex(UserDBVO.SEX_MALE);
 		userDBVO.setImagePath("788.jpg");
+		userDBVO.setStatus(UserDBVO.STATUS_BUSY);
 		this.basicMongoTemplate.insert(userDBVO);		
 	}
 	
@@ -64,5 +65,42 @@ public class UserControllerTest extends BaseControllerTestCase {
 		actions.andExpect(MockMvcResultMatchers.jsonPath("data.id").value("555ff106d4c6394ac1f87688"));
 		actions.andExpect(MockMvcResultMatchers.jsonPath("data.sex").value(UserDBVO.SEX_MALE));
 		actions.andExpect(MockMvcResultMatchers.jsonPath("data.imagePath").value("788.jpg"));
+		actions.andExpect(MockMvcResultMatchers.jsonPath("data.status").value(UserDBVO.STATUS_BUSY));
 	}
+	
+	private void init_changeToBusy() {
+		UserDBVO userDBVO = new UserDBVO();
+		userDBVO.setId("555ff106d4c6394ac1f87688");
+		userDBVO.setStatus(UserDBVO.STATUS_READY);
+		this.basicMongoTemplate.insert(userDBVO);
+	}
+	
+	@Test
+	public void changeToBusy() throws Exception {
+		init_changeToBusy();
+		// perform
+		ResultActions actions = super.mockMvc.perform(MockUtility.populatePutBuilder("/open/person/555ff106d4c6394ac1f87688/changeToBusy.json", null));
+		actions.andExpect(MockMvcResultMatchers.jsonPath("code").value(WebConstants.RESPONSE_CODE_SUCCESS));
+		UserDBVO customerDBVO = userAutoRepo.findOne("555ff106d4c6394ac1f87688");
+		
+		Assert.assertEquals(UserDBVO.STATUS_BUSY, customerDBVO.getStatus());		
+	}
+	
+	private void init_changeToReady() {
+		UserDBVO userDBVO = new UserDBVO();
+		userDBVO.setId("555ff106d4c6394ac1f87688");
+		userDBVO.setStatus(UserDBVO.STATUS_BUSY);
+		this.basicMongoTemplate.insert(userDBVO);
+	}
+	
+	@Test
+	public void changeToReady() throws Exception {
+		init_changeToReady();
+		// perform
+		ResultActions actions = super.mockMvc.perform(MockUtility.populatePutBuilder("/open/person/555ff106d4c6394ac1f87688/changeToReady.json", null));
+		actions.andExpect(MockMvcResultMatchers.jsonPath("code").value(WebConstants.RESPONSE_CODE_SUCCESS));
+		UserDBVO customerDBVO = userAutoRepo.findOne("555ff106d4c6394ac1f87688");
+		
+		Assert.assertEquals(UserDBVO.STATUS_READY, customerDBVO.getStatus());		
+	}	
 }
