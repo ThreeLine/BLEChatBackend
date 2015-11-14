@@ -1,34 +1,52 @@
 package com.fnx.webapp.controller.tenant;
 
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import java.io.File;
 
-import com.fnx.db.entity.tenant.TenantDBVO;
-import com.fnx.repository.mongo.tenant.TenantAutoRepo;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.util.EntityUtils;
+import org.junit.Test;
+
 import com.fnx.webapp.controller.BaseControllerTestCase;
-import com.fnx.webapp.util.WebConstants;
 
 public class TenantControllerTest extends BaseControllerTestCase {
-
-	@Autowired
-	private TenantAutoRepo tenantAutoRepo;
-	
-	private void init_loadTenants() {
-		TenantDBVO tenant = new TenantDBVO();
-		tenant.setFullName("full name");
-		tenant.setShortName("short name");
-		tenant.setTenantCode("tenantCode");
-		this.tenantAutoRepo.save(tenant);
-	}
 	
 	@Test
 	public void loadTenants() throws Exception {
-		init_loadTenants();
-		ResultActions actions = this.mockMvc.perform(MockMvcRequestBuilders.get("/tenants.json"));
-		actions.andExpect(MockMvcResultMatchers.jsonPath("code").value(WebConstants.RESPONSE_CODE_SUCCESS));
-		actions.andExpect(MockMvcResultMatchers.jsonPath("data").exists());
+
+	    HttpClient httpclient = new DefaultHttpClient();
+	    httpclient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+
+	    HttpPost httppost = new HttpPost("http://127.0.0.1:8080/chat/open/image/upload.json");
+	    File file = new File("/Users/oceanyang/purple_button.png");
+
+	    MultipartEntity mpEntity = new MultipartEntity();
+	    ContentBody cbFile = new FileBody(file, "image/jpeg");
+	    mpEntity.addPart("imgFile", cbFile);
+
+
+	    httppost.setEntity(mpEntity);
+	    System.out.println("executing request " + httppost.getRequestLine());
+	    HttpResponse response = httpclient.execute(httppost);
+	    HttpEntity resEntity = response.getEntity();
+
+	    System.out.println(response.getStatusLine());
+	    if (resEntity != null) {
+	      System.out.println(EntityUtils.toString(resEntity));
+	    }
+	    if (resEntity != null) {
+	      resEntity.consumeContent();
+	    }
+
+	    httpclient.getConnectionManager().shutdown();
+		
 	}
 }

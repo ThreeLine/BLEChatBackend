@@ -11,7 +11,11 @@
        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd"
        default-lazy-init="true">
-	
+
+	<bean id="multipartResolver"
+    	class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	</bean>
+		
     <bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor" >
     	<property name="paramName" value="language"></property>
     </bean> 
