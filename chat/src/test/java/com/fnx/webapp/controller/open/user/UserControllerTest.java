@@ -1,5 +1,8 @@
 package com.fnx.webapp.controller.open.user;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,7 @@ import com.fnx.db.entity.user.UserDBVO;
 import com.fnx.repository.mongo.user.UserAutoRepo;
 import com.fnx.webapp.controller.BaseControllerTestCase;
 import com.fnx.webapp.controller.utility.MockUtility;
+import com.fnx.webapp.model.user.LikePersonModel;
 import com.fnx.webapp.model.user.UserModel;
 import com.fnx.webapp.util.WebConstants;
 
@@ -103,4 +107,59 @@ public class UserControllerTest extends BaseControllerTestCase {
 		
 		Assert.assertEquals(UserDBVO.STATUS_READY, customerDBVO.getStatus());		
 	}	
+	
+	private void init_likeYou_bothLike() {
+		List<UserDBVO> users = new ArrayList<UserDBVO>();
+		
+		UserDBVO currentUser = new UserDBVO();
+		currentUser.setId("555ff106d4c6394ac1f87688");
+		currentUser.setName("current");
+		
+		UserDBVO anotherUser = new UserDBVO();
+		anotherUser.setId("555ff106d4c6394ac1f87677");
+		anotherUser.setName("another");
+		anotherUser.getLikes().add("555ff106d4c6394ac1f87688");
+		
+		users.add(currentUser);
+		users.add(anotherUser);
+		this.basicMongoTemplate.insertAll(users);
+	}
+	
+	@Test
+	public void likeYou_bothLike() throws Exception {
+		init_likeYou_bothLike();
+		LikePersonModel likePersonModel = new LikePersonModel();
+		likePersonModel.setId("555ff106d4c6394ac1f87677");
+		ResultActions actions = super.mockMvc.perform(MockUtility.populatePutBuilder("/open/person/555ff106d4c6394ac1f87688/like", likePersonModel));
+		actions.andExpect(MockMvcResultMatchers.jsonPath("code").value(WebConstants.RESPONSE_CODE_SUCCESS));
+		actions.andExpect(MockMvcResultMatchers.jsonPath("data.bothLike").value(true));
+	}
+	
+	private void init_likeYou_singleLike() {
+		List<UserDBVO> users = new ArrayList<UserDBVO>();
+		
+		UserDBVO currentUser = new UserDBVO();
+		currentUser.setId("555ff106d4c6394ac1f87688");
+		currentUser.setName("current");
+		
+		UserDBVO anotherUser = new UserDBVO();
+		anotherUser.setId("555ff106d4c6394ac1f87677");
+		anotherUser.setName("another");
+		
+		users.add(currentUser);
+		users.add(anotherUser);
+		this.basicMongoTemplate.insertAll(users);		
+	}
+	
+	
+	@Test
+	public void likeYou_singleLike() throws Exception {
+		init_likeYou_singleLike();
+		LikePersonModel likePersonModel = new LikePersonModel();
+		likePersonModel.setId("555ff106d4c6394ac1f87677");
+		ResultActions actions = super.mockMvc.perform(MockUtility.populatePutBuilder("/open/person/555ff106d4c6394ac1f87688/like", likePersonModel));
+		actions.andExpect(MockMvcResultMatchers.jsonPath("code").value(WebConstants.RESPONSE_CODE_SUCCESS));
+		actions.andExpect(MockMvcResultMatchers.jsonPath("data.bothLike").value(false));		
+		
+	}
 }

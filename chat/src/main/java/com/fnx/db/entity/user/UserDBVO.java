@@ -1,5 +1,8 @@
 package com.fnx.db.entity.user;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fnx.db.entity.BaseEntity;
@@ -20,6 +23,8 @@ public class UserDBVO extends BaseEntity {
 	private String status = UserDBVO.STATUS_READY;
 	private int age;
 	private String imagePath;
+	//当前用户所like过的人
+	private Set<String> likes = new HashSet<String>();	
 
 	public String getName() {
 		return name;
@@ -59,5 +64,13 @@ public class UserDBVO extends BaseEntity {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public Set<String> getLikes() {
+		return likes;
+	}
+
+	public void setLikes(Set<String> likes) {
+		this.likes = likes;
 	}
 }

@@ -8,8 +8,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fnx.db.entity.user.UserDBVO;
+import com.fnx.domain.factory.DomainFactory;
+import com.fnx.domain.root.user.UserDomain;
 import com.fnx.repository.mongo.user.UserAutoRepo;
 import com.fnx.webapp.model.common.ResponseModel;
+import com.fnx.webapp.model.user.LikePersonModel;
 import com.fnx.webapp.model.user.UserModel;
 import com.fnx.webapp.util.WebConstants;
 
@@ -19,6 +22,8 @@ public class UserController {
 
 	@Autowired
 	private UserAutoRepo userAutoRepo;
+	@Autowired
+	private DomainFactory domainFactory;
 	
 	@RequestMapping(value = "/person/basic", method = RequestMethod.POST)
 	public ResponseModel createBasic(@RequestBody UserModel model) {
@@ -89,5 +94,30 @@ public class UserController {
 		userDBVO.setStatus(UserDBVO.STATUS_READY);
 		userAutoRepo.save(userDBVO);
 		return resModel;		
+	}	
+	
+	@RequestMapping(value = "/person/{id}/like", method = RequestMethod.PUT)
+	public ResponseModel likeYou(@RequestBody LikePersonModel model, @PathVariable String id) {
+		ResponseModel resModel = new ResponseModel();
+		UserDBVO currentUser = userAutoRepo.findOne(id);
+		if (currentUser == null) {
+			resModel.setCode(WebConstants.RESPONSE_CODE_RESOURCE_NOT_EXIST);
+			return resModel;
+		}
+		UserDBVO anotherUser = userAutoRepo.findOne(model.getId());
+		if (anotherUser == null) {
+			resModel.setCode(WebConstants.RESPONSE_CODE_RESOURCE_NOT_EXIST);
+			return resModel;
+		}		
+		currentUser.getLikes().add(model.getId());
+		userAutoRepo.save(currentUser);
+		
+		UserDomain anotherUserDomain = domainFactory.buildUser(anotherUser);
+		boolean anotherLike = anotherUserDomain.haveLiked(id);
+		if (anotherLike) {
+			model.setBothLike(true);
+		}
+		resModel.setData(model);
+		return resModel;
 	}
 }
