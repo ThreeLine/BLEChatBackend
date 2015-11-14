@@ -4,7 +4,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fnx.db.entity.BaseEntity;
 
-@Document(collection = "tenant")
+@Document(collection = "userObject")
 public class UserDBVO extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;
