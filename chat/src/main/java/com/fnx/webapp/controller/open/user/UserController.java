@@ -111,6 +111,7 @@ public class UserController {
 		}		
 		currentUser.getLikes().add(model.getId());
 		userAutoRepo.save(currentUser);
+
 		
 		UserDomain anotherUserDomain = domainFactory.buildUser(anotherUser);
 		boolean anotherLike = anotherUserDomain.haveLiked(id);

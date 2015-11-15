@@ -162,4 +162,16 @@ public class UserControllerTest extends BaseControllerTestCase {
 		actions.andExpect(MockMvcResultMatchers.jsonPath("data.bothLike").value(false));		
 		
 	}
+	
+	private void init_likeYou_likeSelf() {
+		List<UserDBVO> users = new ArrayList<UserDBVO>();
+		
+		UserDBVO currentUser = new UserDBVO();
+		currentUser.setId("555ff106d4c6394ac1f87688");
+		currentUser.setName("current");
+		
+		users.add(currentUser);
+		this.basicMongoTemplate.insertAll(users);			
+	}
+	
 }
