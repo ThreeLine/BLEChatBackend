@@ -40,6 +40,7 @@ public class UserController {
 	
 	@RequestMapping(value = "/person/{id}", method = RequestMethod.PUT)
 	public ResponseModel updateBasic(@RequestBody UserModel model, @PathVariable String id) {
+		System.out.println(model.getImagePath());
 		ResponseModel resModel = new ResponseModel();
 		UserDBVO userDBVO = userAutoRepo.findOne(id);
 		if (userDBVO == null) {
@@ -48,6 +49,7 @@ public class UserController {
 		}
 		userDBVO.setImagePath(model.getImagePath());
 		userAutoRepo.save(userDBVO);
+		System.out.println("finish save imagePath " + model.getImagePath());
 		return resModel;
 	}
 

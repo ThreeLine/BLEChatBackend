@@ -22,7 +22,7 @@ public class UserDBVO extends BaseEntity {
 	private String sex = UserDBVO.SEX_FEMALE;
 	private String status = UserDBVO.STATUS_READY;
 	private int age;
-	private String imagePath;
+	private String imagePath = "";
 	//当前用户所like过的人
 	private Set<String> likes = new HashSet<String>();	
 
